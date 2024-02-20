@@ -296,6 +296,7 @@ fork(void)
   }
   np->sz = p->sz;
 
+
   // copy saved user registers.
   *(np->trapframe) = *(p->trapframe);
 
@@ -311,6 +312,8 @@ fork(void)
   safestrcpy(np->name, p->name, sizeof(p->name));
 
   pid = np->pid;
+  np->trapframe->a0 = 0;
+  np->trace_mask = p->trace_mask;
 
   release(&np->lock);
 
@@ -471,6 +474,20 @@ scheduler(void)
       release(&p->lock);
     }
   }
+}
+
+void freeproc_num(uint64 *dst)
+{
+	struct proc *p;
+	*dst = 0;
+	for(p = proc;p < &proc[NPROC];p++){
+		acquire(&p->lock);
+		if(p->state != UNUSED){ 
+			(*dst)++;
+
+		}
+		release(&p->lock);
+	}
 }
 
 // Switch to scheduler.  Must hold only p->lock
