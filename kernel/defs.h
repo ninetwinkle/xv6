@@ -86,6 +86,7 @@ void            panic(char*) __attribute__((noreturn));
 void            printfinit(void);
 
 // proc.c
+void 		proc_freekernelpt(pagetable_t);
 int             cpuid(void);
 void            exit(int);
 int             fork(void);
@@ -178,7 +179,11 @@ uint64          walkaddr(pagetable_t, uint64);
 int             copyout(pagetable_t, uint64, char *, uint64);
 int             copyin(pagetable_t, char *, uint64, uint64);
 int             copyinstr(pagetable_t, char *, uint64, uint64);
-
+void 		uvmmap(pagetable_t,uint64,uint64,uint64,int);
+void            kvminit(void);
+pagetable_t     proc_kpt_init(void); // 用于内核页表的初始化
+void            kvminithart(void); 
+void            proc_inithart(pagetable_t); // 将进程的内核页表保存到SATP寄存器
 // plic.c
 void            plicinit(void);
 void            plicinithart(void);
@@ -223,3 +228,8 @@ int             sockread(struct sock *, uint64, int);
 int             sockwrite(struct sock *, uint64, int);
 void            sockrecvudp(struct mbuf*, uint32, uint16, uint16);
 #endif
+// part 3 begin
+int             copyin_new(pagetable_t, char*, uint64, uint64);
+int             copyinstr_new(pagetable_t, char*, uint64, uint64);
+void            copy_proc_to_kernel(pagetable_t, pagetable_t, uint64, uint64);
+// part 3 end
